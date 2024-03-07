@@ -6,14 +6,21 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 import gradio as gr
 
+from modelscope.hub.snapshot_download import snapshot_download
+
+model_dir = snapshot_download("zxdlalala/Internlm2_LaborLaw", cache_dir="./models")
+
 
 def load_chain():
     # 加载问答链
     # 定义 Embeddings
-    embeddings = HuggingFaceEmbeddings(model_name="/root/models/sentence-transformer")
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    )
+    # embeddings = HuggingFaceEmbeddings(model_name="/root/models/sentence-transformer")
 
     # 向量数据库持久化路径
-    persist_directory = "/root/code/law_rag/data_base/vector_db/law"
+    persist_directory = "./data_base/vector_db/law"
 
     # 加载数据库
     vectordb = Chroma(
@@ -22,7 +29,7 @@ def load_chain():
     )
 
     # 加载自定义 LLM
-    llm = InternLM2_LLM(model_path="/root/code/law_rag/merged")
+    llm = InternLM2_LLM(model_path="./models/zxdlalala/Internlm2_LaborLaw")
 
     # 定义一个 Prompt Template
     template = """回答规范：
@@ -86,7 +93,7 @@ with block as demo:
     with gr.Row():
         with gr.Column(scale=4):
             # 创建聊天机器人对象
-            chatbot = gr.Chatbot(height=900, show_copy_button=True)
+            chatbot = gr.Chatbot(height=450, show_copy_button=True)
             # 创建文本框组件，用于输入prompt
             msg = gr.Textbox(label="Prompt/问题")
 
